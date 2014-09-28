@@ -1,0 +1,26 @@
+.container
+  .row
+    .col-xs-12
+      h1 Anagrams Service
+
+  .row
+    .col-xs-12
+      h3 Debug Console
+
+  .row
+    .col-xs-9
+      .help-block.pull-left Because sometimes the built-in debbuger doesn't work...
+    .col-xs-3
+      button.btn.btn-default(
+        type="button"
+        ng-click="M.logs = [];"
+      ) Clear
+
+  .row
+    .col-xs-12
+      pre
+        code
+          .alert(
+            ng-repeat="log in M.logs"
+            ng-class="{ 'alert-warning': log.warning, 'alert-info': log.info, 'alert-success': log.success, 'alert-error': log.error }"
+          ) {{ log.message }}
