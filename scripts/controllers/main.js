@@ -7,23 +7,147 @@ angular.module('yololiumApp')
     , '$http'
     , '$sce'
     , 'StConfig'
+    , 'fxMsg'
     , function (
         $scope
       , $http
       , $sce
       , StConfig
+      , fxMsg
     ) {
     var scope = this
       ;
 
     scope.logs = [];
+    scope.messages = [];
 
-    // snthsnthsnh
-    $http.get(StConfig.hrefBase + '/404.html').then(function (resp) {
-      scope.logs.push({ success: true, log: JSON.stringify(resp.data) });
-    }, function (err) {
-      scope.logs.push({ error: true, log: JSON.stringify(err) });
+    scope.send = function (to, text) {
+      // TODO format number
+      fxMsg.send(to, text).then(function (res) {
+        console.log('sent?');
+        console.log(res);
+        scope.logs.push({ success: true, message: res });
+      });
+    };
+
+    fxMsg.on('received', function (r) {
+      // TODO accept command such as '{ "id": "new secret-id", "signature": "sig of id" }';
+      console.log('received');
+      console.log(r);
+      console.log(r.body);
+      scope.logs.push({ success: true, message: r.body });
+      scope.send(r.sender, "This is an automated SMS service. Reply STOP to unsubscribe.");
     });
+
+    scope.delete = function () {
+      // TODO alert # of messages to delete
+      scope.messages.filter(function (msg) {
+        return msg.selected;
+      }).forEach(function (msg) {
+        fxMsg.delete(msg).then(function () {
+          scope.messages.forEach(function (m, i) {
+            if (m === msg) {
+              scope.messages.splice(i, 1);
+            }
+          });
+        });
+      });
+    };
+
+    scope.archive = function (msg) {
+      scope.setRead(msg, true);
+      $http.post(StConfig.hrefBase + '/api/test', msg).then(function (resp) {
+        console.log("POSTed to /api/test");
+        console.log(resp.data);
+      }, function (resp) {
+        console.error("Could not POST to /api/test");
+        console.error(resp);
+      });
+    };
+
+    scope.setRead = function (msg, val) {
+      fxMsg.setRead(msg, val);
+    };
+
+    function run() {
+      fxMsg.get({}).then(function (rs) {
+        rs.forEach(function (r) {
+          scope.messages.push(r);
+        });
+      });
+
+      fxMsg.get({ read: false }).then(function (rs) {
+        console.log('unread messages:');
+        console.log(rs);
+        rs.forEach(function (r) {
+          scope.logs.push({ success: true, message: r.body });
+        });
+      });
+    }
+
+    run();
+
+    function test(opts) {
+      opts = opts || {};
+      var xhr
+        ;
+
+      opts.method = opts.method || !opts.body && 'GET' || 'POST';
+      opts.body = opts.body || null;
+
+      /*
+      xhr = new XMLHttpRequest({ mozAnon: true, mozSystem: true });
+      xhr.open(opts.method, StConfig.hrefBase + '/api/test', true);
+      xhr.onreadystatechange = function() {
+        if (4 === xhr.readyState) {
+          console.log('Native XHR');
+          console.log(xhr);
+          scope.logs.push({ warning: true, message: xhr.responseText });
+        }
+      };
+      xhr.send(opts.body);
+      */
+
+      $.ajaxSetup({
+        xhr: function() { return new window.XMLHttpRequest({ mozSystem: true, mozAnon: true }); }
+      });
+      $.ajax({
+        type: opts.method
+      , url: StConfig.hrefBase + "/api/test"
+      , data: opts.body && JSON.stringify(opts.body) || undefined
+      , contentType: 'application/json'
+      }).then(function (data) {
+        console.log('jQuery SUCESS', data);
+        scope.logs.push({ success: true, message: JSON.stringify(data) });
+      }, function (err) {
+        console.log('jQuery Error', err);
+        scope.logs.push({ error: true, message: err });
+      });
+
+      // snthsnthsnh
+      /*
+      $http[opts.method.toLowerCase()](StConfig.hrefBase + '/api/test', opts.body).then(function (resp) {
+        console.log('$http.get SUCCESS', resp.data);
+        scope.logs.push({ success: true, message: JSON.stringify(resp.data) });
+      }, function (err) {
+        console.error('$http.get ERROR', err);
+        scope.logs.push({ error: true, message: JSON.stringify(err) });
+      });
+      */
+
+      //scope.send(StConfig.testNumber, 'Init to get messages');
+    }
+
+    test({ method: 'POST', body: null });
+    //
+    /*
+    if (false) {
+      test({ method: 'POST', body: null });
+      //test({ method: 'POST', body: { foo: "bar" } });
+      //test({ method: 'GET', body: null });
+    }
+    //*/
+
   }]);
 
 //
@@ -67,9 +191,6 @@ $(function() {
   // TODO Promise
   var log = window.AjLogger.create('#console')
     , db = new window.PouchDB('settings')
-    , phoneNumber = '+18014713042'
-    , secret = 'be a super secret whatever'
-    , homeBase = 'http://cellfox.dev.coolaj86.com:8080'
     , payloadsUrl = homeBase + '/api/phones/:id/notifications' // needs replace
     , registerUrl = homeBase +  '/api/register/phone' // TODO -> /api/register/phone
     , gamestate = {
@@ -586,62 +707,6 @@ $(function() {
     to.push(gamestate.master);
 
     simpleSend(to, msg);
-  }
-
-  function showMessages(id) {
-    var filter = new MozSmsFilter() // https://developer.mozilla.org/en-US/docs/Web/API/MozSmsFilter
-      , cursor
-      ;
-
-    filter.read = false;
-    if ('undefined' !== typeof id) {
-      filter.threadId = id;
-    }
-
-    // Get the messages from the latest to the first
-    cursor = navigator.mozMobileMessage.getMessages(filter, true);
-
-    cursor.onsuccess = function () {
-      var msg = this.result
-        ;
-
-      /*
-      $.ajax({
-        url: '/api/phones/:secret/messages'.replace(':secret', secret)
-      , type: 'POST'
-        // https://developer.mozilla.org/en-US/docs/Web/API/MozSmsMessage.receiver
-      , data: { body: msg.body, sender: msg.sender, receiver: msg.receiver }
-      //, contentType: 'application/json; charset=UTF-8'
-      }).then(function (data) {
-        log.log(JSON.stringify(data));
-      }, function (err) {
-        log.error(JSON.stringify(err));
-      });
-      */
-
-      /*
-      navigator.mozMobileMessage.
-      MozMobileMessageManager.markMessageRead(id, isRead)
-      MozSmsManager.markMessageRead(id, isRead)
-      */
-      log.log(this.result.sender + ': ' + this.result.body);
-      handleMessage(this.result.sender, this.result.body);
-      /*
-      var message = this.result
-        , time = message.timestamp.toDateString()
-        ;
-
-      console.log(time + ': ' + (message.body || message.subject)); // SMS || MMS
-      $("#response").append("<div>Got new message [" + time + "]"
-        + "<br>" + (message.body || message.subject)
-        + "</div>"
-      );
-
-      if (!this.done) {
-        this.continue();
-      }
-      */
-    };
   }
 
   function listenForSms() {

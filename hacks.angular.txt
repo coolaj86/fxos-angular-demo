@@ -1,0 +1,2 @@
+XHR hack (change createXhr function directly in angular source to return an fxos-friendly xhr with mozAnon mozSystem)
+csp hack (add 'ng-csp' to same element as 'ng-app')

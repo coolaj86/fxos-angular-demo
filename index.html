@@ -1,8 +1,4 @@
 <!doctype html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -45,72 +41,13 @@
     <!-- More THEMES at http://bootswatch.com/ -->
     <link href="styles/bootstrap.min.css" rel="stylesheet">
     <link href="styles/font-awesome.min.css" rel="stylesheet">
-    <!-- link href="//netdna.bootstrapcdn.com/bootswatch/3.2.0/united/bootstrap.min.css" rel="stylesheet" -->
-    <!-- link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet" -->
-
-    <style>
-      /*- See more at: http://avexdesigns.com/responsive-youtube-embed/#sthash.tPBpbqe4.dpuf */
-      .video-container {
-          position: relative;
-          padding-bottom: 56.25%;
-          padding-top: 30px; height: 0; overflow: hidden;
-      }
-
-      .video-container video,
-      .video-container .aj-carousel,
-      .video-container iframe,
-      .video-container object,
-      .video-container embed {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-      }
-
-      .css-fb-like {
-        display: inline-block;
-        width: 90px;
-        overflow: hidden;
-      }
-
-      .kw {
-        text-decoration: none;
-        font-style:normal;
-        font-weight:normal;
-      }
-    </style>
   </head>
-  <body ng-app="yololiumApp" ng-strict-di style="padding-top: 1px;">
-  <!--body ng-app="yololiumApp" style="padding-top: 50px;"-->
-    <!--[if lt IE 10]>
-      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-    <![endif]-->
-
-    <!--[if lt IE 9]>
-      <script src="bower_components/es5-shim/es5-shim.js"></script>
-      <script src="bower_components/json3/lib/json3.min.js"></script>
-    <![endif]-->
-
+  <body ng-app="yololiumApp" ng-strict-di ng-csp style="padding-top: 1px;">
     <!-- Add your site or application content here -->
-    <span ui-view="nav" class="st-none" autoscroll="false"></span>
     <div ui-view="body" autoscroll="false"></div>
-    <span ui-view="footer" autoscroll="false"></span>
 
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/angular/angular.js"></script>
-    <script>
-      (function () {
-        'use strict';
-
-        var XHR = window.XMLHttpRequest
-          ;
-
-        window.XMLHttpRequest = function () {
-          return new XHR({ mozAnon: true, mozSystem: true });
-        };
-      }());
-    </script>
 
     <!-- build:js scripts/plugins.js -->
     <script src="vender/require-kiss.js"></script>
@@ -131,6 +68,7 @@
 
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="scripts/app.js"></script>
+    <script src="scripts/services/fx-msg.js"></script>
     <script src="scripts/services/st-alert.js"></script>
     <script src="scripts/controllers/alert.js"></script>
     <script src="scripts/controllers/main.js"></script>

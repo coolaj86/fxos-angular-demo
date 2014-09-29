@@ -1,7 +1,76 @@
 .container
   .row
     .col-xs-12
-      h1 Anagrams Service
+      h1 FxOS Test Messenger
+
+  .row
+    .col-xs-12
+      h3 Send Message
+
+    .col-xs-12
+      label
+        span To
+    .col-xs-12
+      input.form-control(
+        type="tel"
+        ng-model="M.to"
+      )
+    .col-xs-12
+      label
+        span Message
+    .col-xs-9
+      textarea.form-control(
+        ng-model="M.body"
+      )
+    .col-xs-3
+      button.btn.btn-default(
+        type="button"
+        ng-click="M.send(M.to, M.body);"
+      ) Send
+
+  .row
+    .col-xs-12
+      h3 View Messages
+
+      .col-xs-12
+        button.btn.btn-default(ng-class="{ active: 'inbox' === M.view }") Inbox
+        button.btn.btn-default(ng-class="{ active: 'Sent' === M.view }") Sent
+    
+      .col-xs-12(
+        ng-if="!M.messages.length"
+      )
+        .alert.alert-info
+          span No New Messages
+
+      .col-xs-12(
+        ng-repeat="msg in M.messages"
+      )
+        .col-xs-1.checkbox
+          input(
+            type="checkbox"
+            ng-model="msg.selected"
+          )
+        .alert.col-xs-8(
+          ng-class="{ 'alert-warning': msg.receiver, 'alert-info': msg.sender }"
+        )
+          p(ng-if="msg.sender") {{ msg.body }} - From {{ msg.sender }}
+          p(ng-if="msg.receiver") To {{ msg.receiver }}: {{ msg.body }}
+        .col-xs-2
+          button.btn.btn-xs.btn-primary(type="button" ng-click="M.to = msg.sender || msg.receiver;") Reply
+          button.btn.btn-xs.btn-default(type="button" ng-click="M.archive(msg);") Archive
+          //-button.btn.btn-xs.btn-default(ng-if="!msg.read" type="button" ng-click="M.archive(msg);") Archive
+          //-button.btn.btn-xs.btn-default(ng-if="msg.read" type="button" ng-click="M.setRead(msg, false);") Unarchive
+
+      div(ng-if="M.messages.length")
+        button.col-xs-3.btn.btn-xs.btn-danger(type="button" ng-click="M.delete();") Delete
+        button.col-xs-4.btn.btn-xs.btn-default(ng-if="!msg.read" type="button" ng-click="M.setRead(msg, true);") Archive
+        button.col-xs-4.btn.btn-xs.btn-default(ng-if="msg.read" type="button" ng-click="M.setRead(msg, false);") Unarchive
+
+  .row
+    .col-xs-12
+      h3 Participants
+      .col-xs-6(ng-repeat="player in M.players")
+        p {{ player.number }}
 
   .row
     .col-xs-12
@@ -22,5 +91,5 @@
         code
           .alert(
             ng-repeat="log in M.logs"
-            ng-class="{ 'alert-warning': log.warning, 'alert-info': log.info, 'alert-success': log.success, 'alert-error': log.error }"
+            ng-class="{ 'alert-warning': log.warning, 'alert-info': log.info, 'alert-success': log.success, 'alert-danger': log.error }"
           ) {{ log.message }}

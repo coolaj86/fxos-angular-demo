@@ -10,12 +10,24 @@
 (function () {
 
   window.googleAnalyticsToken = 'UA-XXXXXXXX-1';
+  /*
+  var XHR = window.XMLHttpRequest
+    ;
 
-  var x = {
+  window.XMLHttpRequest = function () {
+    return new XHR({ mozAnon: true, mozSystem: true });
+  };
+  */
+
+  var hrefBase = 'http://cellfox.dev.coolaj86.com:7070'
+    , x = {
 //*/
   //.value('StConfig', {
-      apiPrefix: 'http://cellfox.dev.coolaj86.com:8080' + '/api'
-    , hrefBase: 'http://cellfox.dev.coolaj86.com:8080'
+      apiPrefix: hrefBase + '/api'
+    , hrefBase: hrefBase
+    , phoneNumber: '+18014713042'
+    , secret: 'be a super secret whatever'
+    , testNumber: '+18013604427'
 //  });
 ///*
     };

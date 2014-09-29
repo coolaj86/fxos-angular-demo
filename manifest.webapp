@@ -1,7 +1,7 @@
 { "name": "FxOS Angular"
 , "description": "FxOS Angular Demo"
 , "version": "1.0"
-, "type": "privileged"
+, "type": "certified"
 , "launch_path": "/index.html"
 , "developer": {
     "name": "AJ ONeal"
@@ -12,9 +12,19 @@
   , "push": {
       "description": "Tell the phone there are new messages in queue."
     }
+  , "storage": {
+      "description": "To store whether or not the app is already registered for SimplePush"
+    }
+  , "sms": {
+      "description": "You can send and receive text messages in this app."
+    }
+  , "alarms": {
+      "description": "We'll periodically retry to send failed messages. We'll also manually check for new messages since message API is buggy."
+    }
   }
 , "messages": [
-    { "push": "/index.html"}
+    { "alarm": "/index.html" }
+  , { "push": "/index.html"}
   , { "push-register": "/index.html"}
   ]
 }
